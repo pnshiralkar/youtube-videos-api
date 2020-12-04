@@ -11,7 +11,8 @@ from videos.models import Video
 DEVELOPER_KEY = os.environ['YOUTUBE_API_KEY']
 YOUTUBE_API_SERVICE_NAME = 'youtube'
 YOUTUBE_API_VERSION = 'v3'
-SYNC_INTERVAL = int(os.environ['SYNC_INTERVAL'] if 'SYNC_INTERVAL' in os.environ else 10)
+SYNC_INTERVAL = int(
+    os.environ['SYNC_INTERVAL'] if 'SYNC_INTERVAL' in os.environ else 10)
 
 
 def youtube_search(query, max_results, published_after, page_token=None):
@@ -43,12 +44,13 @@ def save_new_videos(new_videos):
             return
 
         # Video doesn't exist, so create save it
-        Video.objects.create(yt_id=video['id']['videoId'],
-                             published_at=video['snippet']['publishedAt'],
-                             title=video['snippet']['title'],
-                             description=video['snippet']['description'],
-                             thumbnail_url=
-                             video['snippet']['thumbnails']['medium']['url'])
+        Video.objects.create(
+            yt_id=video['id']['videoId'],
+            published_at=video['snippet']['publishedAt'],
+            title=video['snippet']['title'],
+            description=video['snippet']['description'],
+            thumbnail_url=video['snippet']['thumbnails']['medium']['url']
+        )
 
 
 class Command(BaseCommand):
