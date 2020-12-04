@@ -36,6 +36,13 @@ def save_new_videos(new_videos):
     """Save the new videos to database"""
 
     for video in new_videos['items']:
+        # Check if the video already exists in database
+        # Prevents duplication of the latest video that repeats in the response
+        video_check = Video.objects.filter(yt_id=video['id']['videoId'])
+        if video_check.exists:
+            return
+
+        # Video doesn't exist, so create save it
         Video.objects.create(yt_id=video['id']['videoId'],
                              published_at=video['snippet']['publishedAt'],
                              title=video['snippet']['title'],
