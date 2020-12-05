@@ -40,8 +40,8 @@ def save_new_videos(new_videos):
         # Check if the video already exists in database
         # Prevents duplication of the latest video that repeats in the response
         video_check = Video.objects.filter(yt_id=video['id']['videoId'])
-        if video_check.exists:
-            return
+        if video_check.exists():
+            continue
 
         # Video doesn't exist, so create save it
         Video.objects.create(
@@ -76,6 +76,7 @@ class Command(BaseCommand):
             # so send multiple request with next page token
             next_page = None
             published_after_str = published_after.isoformat("T") + "Z"
+
             while True:
                 # Get new videos
                 new_videos = youtube_search('football',
@@ -83,11 +84,14 @@ class Command(BaseCommand):
                                             published_after_str,
                                             next_page)
                 # Save the videos to database
-                save_new_videos(new_videos)
+                num_videos = len(new_videos['items'])
+                if num_videos > 0:
+                    save_new_videos(new_videos)
 
-                # If response has next page token, it means there are more
+                # If response has next page token and number of videos in
+                # current response is greater that 0, it means there are more
                 # videos in further pages so set next_page  else break the loop
-                if 'nextPageToken' in new_videos:
+                if 'nextPageToken' in new_videos and num_videos > 0:
                     next_page = new_videos['nextPageToken']
                 else:
                     break
