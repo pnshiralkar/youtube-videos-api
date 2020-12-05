@@ -1,5 +1,6 @@
 import datetime
 import os
+import sys
 from time import sleep
 
 from django.core.management.base import BaseCommand
@@ -65,6 +66,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """Handle the command"""
         self.stdout.write('Sync Service Started...')
+        sys.stdout.flush()
+        # print("Sync Service Started...", flush=True)
 
         # Execute the code infinitely (executed at the interval defined)
         while True:
@@ -113,7 +116,8 @@ class Command(BaseCommand):
                         self.stdout.write("Sync service: API Key error")
                         break
                     else:
-                        self.stderr.write("Sync service: Error calling Youtube API")
+                        self.stderr.write("Sync service: Error calling API")
                 finally:
                     # Sleep for the defined interval
+                    sys.stdout.flush()
                     sleep(SYNC_INTERVAL)
