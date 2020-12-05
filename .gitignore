@@ -58,7 +58,6 @@ coverage.xml
 # Django stuff:
 *.log
 local_settings.py
-db.sqlite3
 db.sqlite3-journal
 
 # Flask stuff:
@@ -130,9 +129,6 @@ dmypy.json
 
 # Django Migrations
 **/migrations
-
-# Django sqlite3 DB
-src/db.sqlite3
 
 # IDE
 .idea
