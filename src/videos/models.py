@@ -9,3 +9,10 @@ class Video(models.Model):
     title = models.TextField()
     description = models.TextField()
     thumbnail_url = models.TextField()
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['published_at']),
+            models.Index(fields=['yt_id'])
+        ]
+
