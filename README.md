@@ -35,7 +35,8 @@
     **6.** `pip install -r requirements.txt`\
     **7.** Create an .env file from the .env.example in /src directory.\
     **8. Run Migrations -** `python manage.py makemigrations && python manage.py migrate`\
-    **9. Running server:**
+    **9. Collect Static files -** `python manage.py collectstatic` (Required for Admin Dashboard)\
+    **10. Running server:**
     - Monolithic way: Run `python manage.py runserver_with_sync`
     - Microservice way: Run in 2 different terminals: `python manage.py sync_with_youtube` and `python manage.py runserver`
 
