@@ -13,6 +13,10 @@ def get_videos(request):
     :returns JSON Response with data or error
     """
 
+    # Allow only GET request
+    if request.method != 'GET':
+        return JsonResponse({"details": "Method not allowed"}, status=405)
+
     # Get all video objects sorted by reverse publish date-time
     videos = Video.objects.all().order_by('-published_at')
 
