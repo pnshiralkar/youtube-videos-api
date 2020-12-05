@@ -1,0 +1,19 @@
+version: "3"
+services:
+  server:
+    image: pnshiralkar/youtube-videos-api
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c " python manage.py makemigrations &&
+              python manage.py migrate &&
+              python manage.py runserver 0.0.0.0:8000"
+    env_file:
+      - .env
+
+  sync_service:
+    image: pnshiralkar/youtube-videos-api
+    command: >
+      sh -c "python manage.py sync_with_youtube"
+    env_file:
+      - src/.env
