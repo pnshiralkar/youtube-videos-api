@@ -4,6 +4,7 @@ from time import sleep
 
 from django.core.management.base import BaseCommand
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 
 from videos.models import Video
 
@@ -21,16 +22,19 @@ def youtube_search(query, max_results, published_after, page_token=None):
     youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
                     developerKey=DEVELOPER_KEY)
 
-    search_response = youtube.search().list(
-        q=query,
-        type='video',
-        order='date',
-        part='id,snippet',
-        publishedAfter=published_after,
-        pageToken=page_token,
-        maxResults=max_results
-    ).execute()
-    return search_response
+    try:
+        search_response = youtube.search().list(
+            q=query,
+            type='video',
+            order='date',
+            part='id,snippet',
+            publishedAfter=published_after,
+            pageToken=page_token,
+            maxResults=max_results
+        ).execute()
+        return search_response
+    except HttpError as e:
+        raise e
 
 
 def save_new_videos(new_videos):
@@ -81,27 +85,35 @@ class Command(BaseCommand):
             # so send multiple request with next page token
             while True:
                 # Get new videos
-                new_videos = youtube_search('football',
-                                            50,
-                                            published_after_str,
-                                            next_page)
-                # Save the videos to database
-                num_videos = len(new_videos['items'])
-                if num_videos > 0:
-                    saved_count += save_new_videos(new_videos)
+                try:
+                    new_videos = youtube_search('football',
+                                                50,
+                                                published_after_str,
+                                                next_page)
+                    # Save the videos to database
+                    num_videos = len(new_videos['items'])
+                    if num_videos > 0:
+                        saved_count += save_new_videos(new_videos)
 
-                # If response has next page token and number of videos in
-                # current response is greater that 0, it means there are more
-                # videos in further pages so set next_page  else break the loop
-                if 'nextPageToken' in new_videos and num_videos > 0:
-                    next_page = new_videos['nextPageToken']
-                else:
-                    break
-            self.stdout.write(
-                "Successfully synced at {} : Added {} new videos".format(
-                    datetime.datetime.utcnow(),
-                    saved_count
-                ))
+                    # If response has next page token and number of videos in
+                    # current response is positive, it means there are more
+                    # videos in further pages so set next_page else break
+                    if 'nextPageToken' in new_videos and num_videos > 0:
+                        next_page = new_videos['nextPageToken']
+                    else:
+                        break
+                    msg = "Sync service: Added {} new videos at {}"
+                    self.stdout.write(msg.format(
+                        saved_count,
+                        datetime.datetime.utcnow()
+                    ))
 
-            # Sleep for the defined interval
-            sleep(SYNC_INTERVAL)
+                except HttpError as e:
+                    if e.resp['status'] == '403':
+                        self.stdout.write("Sync service: API Key error")
+                        break
+                    else:
+                        self.stderr.write("Sync service: Error calling Youtube API")
+                finally:
+                    # Sleep for the defined interval
+                    sleep(SYNC_INTERVAL)
