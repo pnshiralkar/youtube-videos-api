@@ -16,4 +16,4 @@ services:
     command: >
       sh -c "python manage.py sync_with_youtube"
     env_file:
-      - src/.env
+      - .env
