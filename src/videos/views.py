@@ -7,19 +7,40 @@ from videos.models import Video
 
 
 def get_videos(request):
+    """View for API to get videos in descending order of publish date-time
+    Supports Pagination
+    :param (URL param) page = int page_number (default 1)
+    :returns JSON Response with data or error
+    """
+
+    # Get all video objects sorted by reverse publish date-time
     videos = Video.objects.all().order_by('-published_at')
+
+    # Create paginator
     paginator = Paginator(videos, 50)
+
+    # Get Page number from URL params (default 1)
     page_no = int(request.GET.get('page') or '1')
+
+    # Try to get requested page number from paginator.
+    # If it doesn't exist return 404 with proper details
     try:
-        paginated_videos = paginator.page(page_no)
+        page = paginator.page(page_no)
     except EmptyPage:
         return JsonResponse({"details": "Page out of range"}, status=404)
-    next_page = paginated_videos.next_page_number() \
-        if paginated_videos.has_next() else None
-    prev_page = paginated_videos.previous_page_number() \
-        if paginated_videos.has_previous() else None
+
+    # Get next and previous page number if exists, else None
+    next_page = page.next_page_number() \
+        if page.has_next() else None
+    prev_page = page.previous_page_number() \
+        if page.has_previous() else None
+
+    # Get list of dicts of video from the page
+    paginated_videos = [model_to_dict(v) for v in list(page)]
+
+    # Return the JSON Response
     return JsonResponse({
         "next_page": next_page,
         "previous_page": prev_page,
-        "videos": [model_to_dict(v) for v in list(paginated_videos)]
+        "videos": paginated_videos
     })
