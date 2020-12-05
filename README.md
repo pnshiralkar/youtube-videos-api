@@ -38,4 +38,9 @@
     - Monolithic way: Run `python manage.py runserver_with_sync`
     - Microservice way: Run in 2 different terminals: `python manage.py sync_with_youtube` and `python manage.py runserver`
 
-    
+# Details of Project:
+ - As soon as the server is started, the sync service starts syncing the database with Youtube API at an interval set in .env file (default 10s)
+ - The videos in the database are available as REST API at <base_url>/videos
+ - The response defaults to 50 videos at once. To view next ones, use <base_url>/videos?page=<page_num>. The response includes previous and next page numbers.
+ - The videos dashboard is available at <base_url>/admin/videos/video. The default database supplied has admin credentials - Username = admin , Password = admin
+ - The console logs all the requests coming to the server, as well as the sync activity details.
