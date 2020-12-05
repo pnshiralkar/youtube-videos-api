@@ -35,7 +35,7 @@ def youtube_search(query, max_results, published_after, page_token=None):
 
 def save_new_videos(new_videos):
     """Save the new videos to database"""
-
+    saved_count = 0
     for video in new_videos['items']:
         # Check if the video already exists in database
         # Prevents duplication of the latest video that repeats in the response
@@ -51,6 +51,8 @@ def save_new_videos(new_videos):
             description=video['snippet']['description'],
             thumbnail_url=video['snippet']['thumbnails']['medium']['url']
         )
+        saved_count += 1
+    return saved_count
 
 
 class Command(BaseCommand):
@@ -72,11 +74,11 @@ class Command(BaseCommand):
                 published_after = datetime.datetime.utcnow() - \
                                   datetime.timedelta(minutes=30)
 
-            # Youtube API allows only 50 responses in one request,
-            # so send multiple request with next page token
             next_page = None
             published_after_str = published_after.isoformat("T") + "Z"
-
+            saved_count = 0
+            # Youtube API allows only 50 responses in one request,
+            # so send multiple request with next page token
             while True:
                 # Get new videos
                 new_videos = youtube_search('football',
@@ -86,7 +88,7 @@ class Command(BaseCommand):
                 # Save the videos to database
                 num_videos = len(new_videos['items'])
                 if num_videos > 0:
-                    save_new_videos(new_videos)
+                    saved_count += save_new_videos(new_videos)
 
                 # If response has next page token and number of videos in
                 # current response is greater that 0, it means there are more
@@ -95,8 +97,11 @@ class Command(BaseCommand):
                     next_page = new_videos['nextPageToken']
                 else:
                     break
-            self.stdout.write("Sync Completed successfully at {}".format(
-                datetime.datetime.utcnow()))
+            self.stdout.write(
+                "Successfully synced at {} : Added {} new videos".format(
+                    datetime.datetime.utcnow(),
+                    saved_count
+                ))
 
             # Sleep for the defined interval
             sleep(SYNC_INTERVAL)
