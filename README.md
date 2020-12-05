@@ -6,7 +6,8 @@
 - Used Django Server for backend
 - PEP-8 Coding guidelines followed
 - Docker used to containerize the project
-- Dashboard to view all videos in database
+- Admin Dashboard to view all videos in database
+- Multiple API Keys can be added from the admin dashboard
 - Asynchronously sync the database with Youtube APIs
 - Expose videos available in the database as REST API
 
@@ -21,7 +22,7 @@
    **Make sure you have docker and docker-compose installed. If not, refer: https://docs.docker.com/install/**
    - Create an .env file from the [.env.example file from repo](https://github.com/pnshiralkar/youtube-videos-api/blob/main/.env.example).
    - Download [Docker-compose file form this repo](https://github.com/pnshiralkar/youtube-videos-api/blob/main/docker-compose.yml)
-   - Run `sudo docker-compose up`
+   - Run `docker-compose up`
 * ### Download code and run - 
     **1. [Download](https://github.com/pnshiralkar/youtube-videos-api/archive/master.zip) and extract the zip of Project and cd inside**\
     **OR**\
@@ -40,7 +41,9 @@
 
 # Details of Project:
  - As soon as the server is started, the sync service starts syncing the database with Youtube API at an interval set in .env file (default 10s)
+ - Admin dashboard can be accessed at <base_url>/admin. The default database supplied has admin credentials - Username = admin , Password = admin
+ - The API Keys can be added from admin dashboard. Please add an API Key to database from dashboard. 
  - The videos in the database are available as REST API at <base_url>/videos
  - The response defaults to 50 videos at once. To view next ones, use <base_url>/videos?page=<page_num>. The response includes previous and next page numbers.
- - The videos dashboard is available at <base_url>/admin/videos/video. The default database supplied has admin credentials - Username = admin , Password = admin
+ - The videos dashboard is available in admin dashboard itslef, at <base_url>/admin/videos/video.
  - The console logs all the requests coming to the server, as well as the sync activity details.
