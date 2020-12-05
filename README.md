@@ -19,8 +19,8 @@
 * ## Using Docker - 
   **Uses Micro services**\
    **Make sure you have docker and docker-compose installed. If not, refer: https://docs.docker.com/install/**
-   - Create an .env file from the .env.example.
-   - Download [Docker-compose file form this repo](https://github.com/pnshiralkar/youtube-videos-api/docker-compose.yml)
+   - Create an .env file from the [.env.example file from repo](https://github.com/pnshiralkar/youtube-videos-api/blob/main/.env.example).
+   - Download [Docker-compose file form this repo](https://github.com/pnshiralkar/youtube-videos-api/blob/main/docker-compose.yml)
    - Run `sudo docker-compose up`
 * ### Download code and run - 
     **1. [Download](https://github.com/pnshiralkar/youtube-videos-api/archive/master.zip) and extract the zip of Project and cd inside**\
